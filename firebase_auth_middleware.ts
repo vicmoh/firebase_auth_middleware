@@ -1,6 +1,4 @@
 /**
- * Copyright (c) 2020 by Schmick. All rights reserved.
- * 
  * This class is used as a middleware
  * to be able to use express node in
  * Firebase function, so that you can
