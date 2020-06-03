@@ -12,8 +12,8 @@
  * Last modified  : 2020-05-15 03:47:25
  */
 
-import * as admin from 'firebase-admin';
-const debug = process.env.APP_DEBUG === 'true';
+import * as admin from "firebase-admin";
+const debug = process.env.APP_DEBUG === "true";
 
 /**
  * This class is used as Middleware
@@ -40,9 +40,9 @@ export class FirebaseAuthMiddleware {
    * @param next
    */
   public static auth(req: any, res: any, next: any) {
-    const authorization = req.header('Authorization');
+    const authorization = req.header("Authorization");
     if (authorization) {
-      const token = authorization.split(' ');
+      const token = authorization.split(" ");
       admin
         .auth()
         .verifyIdToken(token[1])
@@ -56,7 +56,7 @@ export class FirebaseAuthMiddleware {
           res.sendStatus(401);
         });
     } else {
-      FirebaseAuthMiddleware.log('Authorization header is not found');
+      FirebaseAuthMiddleware.log("Authorization header is not found");
       res.sendStatus(401);
     }
   }
@@ -88,50 +88,50 @@ export class FirebaseAuthMiddleware {
    * @param next
    */
   public static async validateIdToken(req: any, res: any, next: any = null) {
-    console.log('Check if request is authorized with Firebase ID token');
+    console.log("Check if request is authorized with Firebase ID token");
 
     if (
       (!req.headers.authorization ||
-        !req.headers.authorization.startsWith('Bearer ')) &&
+        !req.headers.authorization.startsWith("Bearer ")) &&
       !(req.cookies && req.cookies.__session)
     ) {
       console.error(
-        'No Firebase ID token was passed as a Bearer token in the Authorization header.',
-        'Make sure you authorize your request by providing the following HTTP header:',
-        'Authorization: Bearer <Firebase ID Token>',
+        "No Firebase ID token was passed as a Bearer token in the Authorization header.",
+        "Make sure you authorize your request by providing the following HTTP header:",
+        "Authorization: Bearer <Firebase ID Token>",
         'or by passing a "__session" cookie.'
       );
-      res.status(403).send('Unauthorized');
+      res.status(403).send("Unauthorized");
       return;
     }
 
     let idToken;
     if (
       req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer ')
+      req.headers.authorization.startsWith("Bearer ")
     ) {
       console.log('Found "Authorization" header');
       // Read the ID Token from the Authorization header.
-      idToken = req.headers.authorization.split('Bearer ')[1];
+      idToken = req.headers.authorization.split("Bearer ")[1];
     } else if (req.cookies) {
       console.log('Found "__session" cookie');
       // Read the ID Token from cookie.
       idToken = req.cookies.__session;
     } else {
       // No cookie
-      res.status(403).send('Unauthorized');
+      res.status(403).send("Unauthorized");
       return;
     }
 
     try {
       const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-      console.log('ID Token correctly decoded', decodedIdToken);
+      console.log("ID Token correctly decoded", decodedIdToken);
       req.user = decodedIdToken;
       if (!(next === null || next === undefined)) next();
       return;
     } catch (error) {
-      console.error('Error while verifying Firebase ID token:', error);
-      res.status(403).send('Unauthorized');
+      console.error("Error while verifying Firebase ID token:", error);
+      res.status(403).send("Unauthorized");
       return;
     }
   }
