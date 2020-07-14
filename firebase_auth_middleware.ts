@@ -12,8 +12,28 @@
  * Last modified  : 2020-05-15 03:47:25
  */
 
+import { Request } from 'express'
 import * as admin from "firebase-admin";
 const debug = process.env.APP_DEBUG === "true";
+
+/**
+ * Firebase authenticated user model.
+ */
+export interface FBAuthUser {
+  uid: string;
+  phone: string;
+}
+
+/**
+ * Get the firebase user model from the request.
+ */
+export function getFBUserFromReq(req: Request) : FBAuthUser {
+  const user: any = (req as any)?.user;
+  return {
+    uid: user?.uid ?? '',
+    phone: user?.phone_number ?? '',
+  };
+}
 
 /**
  * This class is used as Middleware
@@ -39,7 +59,7 @@ export class FirebaseAuthMiddleware {
    * @param res
    * @param next
    */
-  public static auth(req: any, res: any, next: any) {
+  public auth(req: any, res: any, next: any) {
     const authorization = req.header("Authorization");
     if (authorization) {
       const token = authorization.split(" ");
@@ -87,7 +107,7 @@ export class FirebaseAuthMiddleware {
    * @param res
    * @param next
    */
-  public static async validateIdToken(req: any, res: any, next: any = null) {
+  public async validateIdToken(req: any, res: any, next: any = null) {
     console.log("Check if request is authorized with Firebase ID token");
 
     if (
@@ -99,7 +119,7 @@ export class FirebaseAuthMiddleware {
         "No Firebase ID token was passed as a Bearer token in the Authorization header.",
         "Make sure you authorize your request by providing the following HTTP header:",
         "Authorization: Bearer <Firebase ID Token>",
-        'or by passing a "__session" cookie.'
+        'or by passing a ' +  req?.cookies?.__session ?? "__session"  + ' cookie.'
       );
       res.status(403).send("Unauthorized");
       return;
@@ -114,7 +134,7 @@ export class FirebaseAuthMiddleware {
       // Read the ID Token from the Authorization header.
       idToken = req.headers.authorization.split("Bearer ")[1];
     } else if (req.cookies) {
-      console.log('Found "__session" cookie');
+      console.log('Found ' +  req?.cookies?.__session ?? "__session"  + ' cookie');
       // Read the ID Token from cookie.
       idToken = req.cookies.__session;
     } else {

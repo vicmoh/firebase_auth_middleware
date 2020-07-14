@@ -55,7 +55,7 @@ _app.use(_express.json());
 _app.use(_cors);
 _app.options("*", _cors);
 _app.use(_cookieParser);
-_app.use(FirebaseAuthMiddleware.validateIdToken); // Authorization: Bearer <your-client-token>
+_app.use(new FirebaseAuthMiddleware().validateIdToken); // Authorization: Bearer <your-client-token>
 
 /* -------------------------------------------------------------------------- */
 /*                      Express HTTPS end point functions                     */
