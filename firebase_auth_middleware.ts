@@ -14,7 +14,7 @@
 
 import { Request } from 'express'
 import * as admin from "firebase-admin";
-const debug = process.env.APP_DEBUG === "true";
+const debug = true;
 
 /**
  * Firebase authenticated user model.
