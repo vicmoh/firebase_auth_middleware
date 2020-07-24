@@ -16,6 +16,7 @@ export class SimpleResponse {
   private _code: number;
   private _error: boolean;
   private _res: Response;
+
   /**
    * Constructor
    * @param {*} res Express result
