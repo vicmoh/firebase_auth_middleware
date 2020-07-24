@@ -4,3 +4,6 @@ git:
 	git commit -m '$(m)'
 	git push
 
+new:
+	git branch $(version); git checkout $(version); git push --set-upstream origin $(version); git checkout master;
+
