@@ -36,8 +36,7 @@ export class SimpleResponse {
    * @param {*} data optional data paramter
    */
   success(message?: string, data?: any) {
-    if (!message) this._message = "Success!";
-    else this._message = message ?? "Request successful.";
+    this._message = message ?? "Request successful.";
     this._data = data ?? {};
     this._code = 200;
     this._error = false;
@@ -50,8 +49,7 @@ export class SimpleResponse {
    * @param {*} data optional data paramter
    */
   error(message?: string, data?: any) {
-    if (!message) this._message = "Oops, something went wrong!";
-    else this._message = message ?? "Request failed.";
+    this._message = message ?? "Oops, something went wrong!";
     this._data = data ?? {};
     this._code = 404;
     this._error = true;
