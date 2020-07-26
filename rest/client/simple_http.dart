@@ -27,8 +27,8 @@ class SimpleHttp {
   static String _defaultApiUrl;
 
   /// The main domain URL for requesting data
-  String apiUrl; 
- 
+  String apiUrl;
+
   /// Determine it is using
   /// [init] function.
   static bool isInit = false;
@@ -45,13 +45,14 @@ class SimpleHttp {
     bool showDebug = false,
   }) : _debug = showDebug ?? false {
     if (!isInit) {
-      assert(defaultApiUrl != null, "apiUrl must be passed if SimpleHttp.init() is never called.");
-      assert(accessToken  != null, "accessToken must be passed if SimpleHttp.init() is never called.");
+      assert(defaultApiUrl != null,
+          "apiUrl must be passed if SimpleHttp.init() is never called.");
+      assert(accessToken != null,
+          "accessToken must be passed if SimpleHttp.init() is never called.");
+      SimpleHttp._accessToken = accessToken;
     }
     this.apiUrl = apiUrl ?? _defaultApiUrl;
-    SimpleHttp._accessToken = accessToken;
   }
-
 
   /// Initialize default setup for
   /// the http post and get request.
@@ -65,8 +66,11 @@ class SimpleHttp {
     String defaultApiUrl,
   }) {
     assert(!isInit, 'You should only only call SimpleHttp.init() once.');
-    assert(accessToken != null, "On SimpleHttp.init(), accessToken must not be null.");
-    assert(defaultApiUrl != null, "on SimpleHttp.init(), defaultApiUrl must not be null."); 
+    assert(accessToken != null,
+        "On SimpleHttp.init(), accessToken must not be null.");
+    assert(defaultApiUrl != null,
+        "on SimpleHttp.init(), defaultApiUrl must not be null.");
+    SimpleHttp.isInit = true;
     SimpleHttp._accessToken = accessToken;
     SimpleHttp._defaultApiUrl = defaultApiUrl;
   }
@@ -74,15 +78,18 @@ class SimpleHttp {
   /// HTTP get. [url] example: 'www.myurl.com'.
   /// Where [apiPath] might be '/api/v1/test'.
   Future<dynamic> _get(
-      String url, 
-      String apiPath, {
-      Map<String, String> body, 
-      Map<String, String> headers,
+    String url,
+    String apiPath, {
+    Map<String, String> body,
+    Map<String, String> headers,
   }) async {
     assert(body != null, 'body parameter must not be null.');
     assert(headers != null, 'headers parameter must not be null.');
-    final uri = Uri.https(url, apiPath, body); 
-    await _http.get(uri, headers: headers);
+    final stripUrl = url.replaceAll(RegExp(r"http[s]?://"), "");
+    final uri = Uri.https(stripUrl, apiPath, body);
+    final res = await _http.get(uri, headers: headers);
+    Log(this, '_get(): res = $res');
+    return res;
   }
 
   Future<Map<String, dynamic>> _request(
@@ -97,39 +104,44 @@ class SimpleHttp {
 
     /// Set up headers
     Map<String, String> headers = {
-      'Authorization': "Bearer ${SimpleHttp.accessToken(TokenStatus(isTokenExpired: false))}"
+      'Authorization':
+          "Bearer ${SimpleHttp.accessToken(TokenStatus(isTokenExpired: false))}"
     };
 
     /// Try without refreshing token.
+    Log(this, 'Http request: ${this.apiUrl}$urlPath');
     ServerResponse res;
     try {
       /// First try if the token is not expired.
-      if (_HttpType.get == httpType) 
-       res = ServerResponse(await _get(
-               this.apiUrl, urlPath, body: body, headers: headers)); 
-      else
+      if (_HttpType.get == httpType)
         res = ServerResponse(
-            await _http.post(this.apiUrl + urlPath, headers: headers, body: body));
+            await _get(this.apiUrl, urlPath, body: body, headers: headers));
+      else
+        res = ServerResponse(await _http.post(this.apiUrl + urlPath,
+            headers: headers, body: body));
     } catch (_) {
       /// Session is probably expired.
       if (debug) Log(this, 'Token has expired.');
       try {
-        final token = await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
+        final token =
+            await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
         headers = {'Authorization': "Bearer ${token}"};
       } catch (err) {
         throw Exception('Could not get new token session.');
       }
 
-      /// Second try with another new token. 
+      /// Second try with another new token.
       if (httpType == _HttpType.get)
-        res = ServerResponse(await _get(this.apiUrl, urlPath, body: body, headers: headers));
+        res = ServerResponse(await _get(this.apiUrl, urlPath,
+            body: Map<String, String>.from(body), headers: headers));
       else
-        res = ServerResponse(
-            await _http.post(this.apiUrl + urlPath, headers: headers, body: body));
+        res = ServerResponse(await _http.post(this.apiUrl + urlPath,
+            headers: headers, body: Map<String, String>.from(body)));
     }
 
     /// Return the response.
-    if (debug && res.isError) Log(func, 'Server request error -> $res.message');
+    if (debug && res.isError)
+      Log(func, 'Server request error -> ${res.message}');
     if (res.isError) throw Exception(res.message);
     try {
       if (debug) Log(func, 'res.data: ${res.data}');
@@ -141,11 +153,12 @@ class SimpleHttp {
   }
 
   /// Get request.
-  Future<Map<String, String>> get(String urlPath, Map<String, dynamic> body) async =>
-    _request(urlPath, body: body, httpType: _HttpType.get);
+  Future<Map<String, dynamic>> get(
+          String urlPath, Map<String, dynamic> body) async =>
+      _request(urlPath, body: body, httpType: _HttpType.get);
 
   /// Post request.
-  Future<Map<String, String>> post(String urlPath, Map<String, String> body) async =>
-    _request(urlPath, body: body, httpType: _HttpType.post);
+  Future<Map<String, dynamic>> post(
+          String urlPath, Map<String, String> body) async =>
+      _request(urlPath, body: body, httpType: _HttpType.post);
 }
-

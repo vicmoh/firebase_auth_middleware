@@ -2,16 +2,25 @@
 import 'dart:convert';
 import 'package:http/http.dart';
 
+/// Server response.
 class ServerResponse {
+  /// Determine if response is an error.
   bool isError = true;
+
+  /// The response data.
   var data;
+
+  /// Response message.
   String message;
+
+  /// Create server response.
   ServerResponse(Response res) {
     try {
       if (!_isValidResponse(res)) throw Exception("Invalid server response!");
       var errMess = 'The URL api request is probably wrong.';
       assert(res.body != "", errMess);
       assert(res.body != null, errMess);
+      print('server response res.body: ${res.body}');
       var jsonObject = json.decode(res.body);
       //Check for success object
       if (jsonObject["success"] != null) {
