@@ -103,12 +103,10 @@ class SimpleHttp {
     if (debug) Log(func, 'Fetching httpPost: $urlPath');
 
     /// Set up headers
-    var firstToken = await SimpleHttp.accessToken(TokenStatus(isTokenExpired: false));
+    var firstToken =
+        await SimpleHttp.accessToken(TokenStatus(isTokenExpired: false));
     assert(firstToken != null, 'Session token must not be null.');
-    Map<String, String> headers = {
-      'Authorization':
-          "Bearer $firstToken"
-    };
+    Map<String, String> headers = {'Authorization': "Bearer $firstToken"};
 
     /// Try without refreshing token.
     Log(this, 'Http request: ${this.apiUrl}$urlPath');
