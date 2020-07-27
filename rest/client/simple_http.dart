@@ -88,7 +88,6 @@ class SimpleHttp {
     final stripUrl = url.replaceAll(RegExp(r"http[s]?://"), "");
     final uri = Uri.https(stripUrl, apiPath, body);
     final res = await _http.get(uri, headers: headers);
-    Log(this, '_get(): res = $res');
     return res;
   }
 
