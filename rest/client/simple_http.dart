@@ -103,9 +103,11 @@ class SimpleHttp {
     if (debug) Log(func, 'Fetching httpPost: $urlPath');
 
     /// Set up headers
+    var firstToken = await SimpleHttp.accessToken(TokenStatus(isTokenExpired: false));
+    assert(firstToken != null, 'Session token must not be null.');
     Map<String, String> headers = {
       'Authorization':
-          "Bearer ${SimpleHttp.accessToken(TokenStatus(isTokenExpired: false))}"
+          "Bearer $firstToken"
     };
 
     /// Try without refreshing token.
@@ -114,17 +116,19 @@ class SimpleHttp {
     try {
       /// First try if the token is not expired.
       if (_HttpType.get == httpType)
-        res = ServerResponse(
-            await _get(this.apiUrl, urlPath, body: body, headers: headers));
+        res = ServerResponse(await _get(this.apiUrl, urlPath,
+            body: Map<String, String>.from(body), headers: headers));
       else
         res = ServerResponse(await _http.post(this.apiUrl + urlPath,
             headers: headers, body: body));
-    } catch (_) {
+    } catch (err) {
       /// Session is probably expired.
-      if (debug) Log(this, 'Token has expired.');
+      if (debug) Log(this, 'Token may have expired.');
+      if (debug) Log(this, 'Session probably expired: Catch -> $err');
       try {
         final token =
             await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
+        assert(token != null, 'Token has expired. Token must not be null.');
         headers = {'Authorization': "Bearer ${token}"};
       } catch (err) {
         throw Exception('Could not get new token session.');
@@ -154,11 +158,11 @@ class SimpleHttp {
 
   /// Get request.
   Future<Map<String, dynamic>> get(
-          String urlPath, Map<String, dynamic> body) async =>
+          String urlPath, Map<String, String> body) async =>
       _request(urlPath, body: body, httpType: _HttpType.get);
 
   /// Post request.
   Future<Map<String, dynamic>> post(
-          String urlPath, Map<String, String> body) async =>
+          String urlPath, Map<String, dynamic> body) async =>
       _request(urlPath, body: body, httpType: _HttpType.post);
 }
