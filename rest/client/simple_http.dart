@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as _http;
 import 'package:dart_util/dart_util.dart';
 import './server_response.dart';
+import 'package:meta/meta.dart';
 
 enum _HttpType { post, get }
 
@@ -35,7 +36,7 @@ class SimpleHttp {
 
   /// Determine whether to show debug prints.
   bool get debug => _debug;
-  bool _debug = false;
+  final bool _debug;
 
   /// Create a simple http call.
   /// Used with Firebase authenticate middleware.
@@ -46,9 +47,9 @@ class SimpleHttp {
   }) : _debug = showDebug ?? false {
     if (!isInit) {
       assert(defaultApiUrl != null,
-          "apiUrl must be passed if SimpleHttp.init() is never called.");
+          'apiUrl must be passed if SimpleHttp.init() is never called.');
       assert(accessToken != null,
-          "accessToken must be passed if SimpleHttp.init() is never called.");
+          'accessToken must be passed if SimpleHttp.init() is never called.');
       SimpleHttp._accessToken = accessToken;
     }
     this.apiUrl = apiUrl ?? _defaultApiUrl;
@@ -67,25 +68,25 @@ class SimpleHttp {
   }) {
     assert(!isInit, 'You should only only call SimpleHttp.init() once.');
     assert(accessToken != null,
-        "On SimpleHttp.init(), accessToken must not be null.");
+        'On SimpleHttp.init(), accessToken must not be null.');
     assert(defaultApiUrl != null,
-        "on SimpleHttp.init(), defaultApiUrl must not be null.");
+        'on SimpleHttp.init(), defaultApiUrl must not be null.');
     SimpleHttp.isInit = true;
     SimpleHttp._accessToken = accessToken;
     SimpleHttp._defaultApiUrl = defaultApiUrl;
   }
 
-  /// HTTP get. [url] example: 'www.myurl.com'.
+  /// HTTP get. [url] example: 'www.myUrl.com'.
   /// Where [apiPath] might be '/api/v1/test'.
   Future<dynamic> _get(
     String url,
     String apiPath, {
-    Map<String, String> body,
-    Map<String, String> headers,
+    @required Map<String, String> body,
+    @required Map<String, String> headers,
   }) async {
     assert(body != null, 'body parameter must not be null.');
     assert(headers != null, 'headers parameter must not be null.');
-    final stripUrl = url.replaceAll(RegExp(r"http[s]?://"), "");
+    final stripUrl = url.replaceAll(RegExp(r'http[s]?://'), '');
     final uri = Uri.https(stripUrl, apiPath, body);
     final res = await _http.get(uri, headers: headers);
     return res;
@@ -105,19 +106,19 @@ class SimpleHttp {
     var firstToken =
         await SimpleHttp.accessToken(TokenStatus(isTokenExpired: false));
     assert(firstToken != null, 'Session token must not be null.');
-    Map<String, String> headers = {'Authorization': "Bearer $firstToken"};
+    var headers = <String, String>{'Authorization': 'Bearer $firstToken'};
 
     /// Try without refreshing token.
-    Log(this, 'Http request: ${this.apiUrl}$urlPath');
+    Log(this, 'Http request: $apiUrl$urlPath');
     ServerResponse res;
     try {
       /// First try if the token is not expired.
       if (_HttpType.get == httpType)
-        res = ServerResponse(await _get(this.apiUrl, urlPath,
+        res = ServerResponse(await _get(apiUrl, urlPath,
             body: Map<String, String>.from(body), headers: headers));
       else
-        res = ServerResponse(await _http.post(this.apiUrl + urlPath,
-            headers: headers, body: body));
+        res = ServerResponse(
+            await _http.post(apiUrl + urlPath, headers: headers, body: body));
     } catch (err) {
       /// Session is probably expired.
       if (debug) Log(this, 'Token may have expired.');
@@ -126,17 +127,17 @@ class SimpleHttp {
         final token =
             await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
         assert(token != null, 'Token has expired. Token must not be null.');
-        headers = {'Authorization': "Bearer ${token}"};
+        headers = {'Authorization': 'Bearer ${token}'};
       } catch (err) {
         throw Exception('Could not get new token session.');
       }
 
       /// Second try with another new token.
       if (httpType == _HttpType.get)
-        res = ServerResponse(await _get(this.apiUrl, urlPath,
+        res = ServerResponse(await _get(apiUrl, urlPath,
             body: Map<String, String>.from(body), headers: headers));
       else
-        res = ServerResponse(await _http.post(this.apiUrl + urlPath,
+        res = ServerResponse(await _http.post(apiUrl + urlPath,
             headers: headers, body: Map<String, String>.from(body)));
     }
 
