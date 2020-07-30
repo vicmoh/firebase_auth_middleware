@@ -133,12 +133,16 @@ class SimpleHttp {
       }
 
       /// Second try with another new token.
-      if (httpType == _HttpType.get)
-        res = ServerResponse(await _get(apiUrl, urlPath,
-            body: Map<String, String>.from(body), headers: headers));
-      else
-        res = ServerResponse(await _http.post(apiUrl + urlPath,
-            headers: headers, body: Map<String, String>.from(body)));
+      try {
+        if (httpType == _HttpType.get)
+          res = ServerResponse(await _get(apiUrl, urlPath,
+              body: Map<String, String>.from(body), headers: headers));
+        else
+          res = ServerResponse(await _http.post(apiUrl + urlPath,
+              headers: headers, body: Map<String, String>.from(body)));
+      } catch (err) {
+        throw Exception(err);
+      }
     }
 
     /// Return the response.
