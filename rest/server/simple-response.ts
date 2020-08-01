@@ -37,7 +37,7 @@ export class SimpleResponse {
    */
   success(message?: string, data?: any) {
     this._message = message ?? "Request successful.";
-    this._data = data ?? {};
+    this._data = data ?? this._data ?? {};
     this._code = 200;
     this._error = false;
     return this;
