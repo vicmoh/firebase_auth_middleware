@@ -63,8 +63,8 @@ class SimpleHttp {
   /// [accessToken] and [apiUrl] can be passed as null,
   /// else they must be passed upon calling post or get request.
   static void init({
-    Future<String> Function(TokenStatus) accessToken,
-    String defaultApiUrl,
+    @required Future<String> Function(TokenStatus) accessToken,
+    @required String defaultApiUrl,
   }) {
     assert(!isInit, 'You should only only call SimpleHttp.init() once.');
     assert(accessToken != null,

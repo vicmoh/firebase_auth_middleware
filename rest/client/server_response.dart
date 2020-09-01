@@ -20,7 +20,6 @@ class ServerResponse {
       var errMess = 'The URL api request is probably wrong.';
       assert(res.body != "", errMess);
       assert(res.body != null, errMess);
-      print('server response res.body: ${res.body}');
       var jsonObject = json.decode(res.body);
       //Check for success object
       if (jsonObject["success"] != null) {
