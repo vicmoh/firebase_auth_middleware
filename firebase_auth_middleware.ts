@@ -20,8 +20,8 @@ const debug = true;
  * Firebase authenticated user model.
  */
 export interface FBAuthUser {
-  uid: string;
-  phone: string;
+  uid?: string;
+  phone?: string;
 }
 
 /**
@@ -30,8 +30,8 @@ export interface FBAuthUser {
 export function getFBUserFromReq(req: Request) : FBAuthUser {
   const user: any = (req as any)?.user;
   return {
-    uid: user?.uid ?? '',
-    phone: user?.phone_number ?? '',
+    uid: user?.uid,
+    phone: user?.phone_number,
   };
 }
 
