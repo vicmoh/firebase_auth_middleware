@@ -22,12 +22,13 @@ export class SimpleResponse {
    * @param {*} res Express result
    */
   constructor(res: Response) {
+    const initMess = "Simple response must call success or error method."; 
     this._res = res;
     this._data = {};
     this._code = 200;
-    this._message = "";
-    this._devMessage = "";
-    this._error = false;
+    this._message = initMess;
+    this._devMessage = initMess;
+    this._error = true;
   }
 
   /**
@@ -35,9 +36,8 @@ export class SimpleResponse {
    * @param {string} message User friendly message
    * @param {*} data optional data paramter
    */
-  success(message?: string, data?: any) {
+  success(message?: string) {
     this._message = message ?? "Request successful.";
-    this._data = data ?? this._data ?? {};
     this._code = 200;
     this._error = false;
     return this;
@@ -48,9 +48,8 @@ export class SimpleResponse {
    * @param {*} message Optional user friendly message
    * @param {*} data optional data paramter
    */
-  error(message?: string, data?: any) {
+  error(message?: string) {
     this._message = message ?? "Oops, something went wrong!";
-    this._data = data ?? {};
     this._code = 404;
     this._error = true;
     return this;
@@ -60,9 +59,8 @@ export class SimpleResponse {
    * Standard unauthorized response
    * @param {*} data optional data
    */
-  unauthorized(data?: KeyValuePair<any>) {
+  unauthorized() {
     this._message = "Oops, you are not authorized to complete this action!";
-    if (data) this._data = data;
     this._code = 403;
     this._error = true;
     return this;
