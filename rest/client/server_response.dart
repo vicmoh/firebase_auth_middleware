@@ -25,12 +25,12 @@ class ServerResponse {
       if (jsonObject["success"] != null) {
         this.isError = false;
         this.data = jsonObject["success"]["data"];
-        this.message = jsonObject["success"]["message"];
+        this.message = jsonObject["success"]["message"].toString();
       } else if (jsonObject["error"] != null) {
         this.isError = true;
         this.data = jsonObject["error"]["data"];
-        this.message = jsonObject["error"]["message"];
-        throw Exception(jsonObject['error']['message']);
+        this.message = jsonObject["error"]["message"].toString();
+        throw Exception(this.message);
       } else {
         throw Exception("Invalid server response!");
       }
