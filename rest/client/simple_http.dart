@@ -105,7 +105,8 @@ class SimpleHttp {
     /// Set up headers
     var firstToken =
         await SimpleHttp.accessToken(TokenStatus(isTokenExpired: false));
-    assert(firstToken != null, 'Session token must not be null.');
+    if (debug && firstToken == null)
+      Log(this, '[WARNING]: First token is null.');
     var headers = <String, String>{'Authorization': 'Bearer $firstToken'};
 
     /// Try without refreshing token.
@@ -126,7 +127,8 @@ class SimpleHttp {
       try {
         final token =
             await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
-        assert(token != null, 'Token has expired. Token must not be null.');
+        if (debug && token == null)
+          Log(this, 'Token has expired. Token must not be null.');
         headers = {'Authorization': 'Bearer ${token}'};
       } catch (err) {
         throw Exception('Could not get new token session.');
