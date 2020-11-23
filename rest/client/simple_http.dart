@@ -96,6 +96,7 @@ class SimpleHttp {
     String urlPath, {
     Map<String, dynamic> body,
     _HttpType httpType,
+    bool noCache = false,
   }) async {
     const func = 'httpPost';
     assert(httpType != null);
@@ -108,6 +109,13 @@ class SimpleHttp {
     if (debug && firstToken == null)
       Log(this, '[WARNING]: First token is null.');
     var headers = <String, String>{'Authorization': 'Bearer $firstToken'};
+    
+    /// No cache if it's is set for get API only.
+    if (httpType == _HttpType.get && noCache) {
+      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0';
+      headers['Pragma'] = 'no-cache';
+      headers['Expires'] = '0';
+    }
 
     /// Try without refreshing token.
     Log(this, 'Http request: $apiUrl$urlPath');
@@ -162,8 +170,8 @@ class SimpleHttp {
 
   /// Get request.
   Future<Map<String, dynamic>> get(
-          String urlPath, Map<String, String> body) async =>
-      _request(urlPath, body: body, httpType: _HttpType.get);
+          String urlPath, Map<String, String> body, {bool noCache = false}) async =>
+      _request(urlPath, body: body, httpType: _HttpType.get, noCache: noCache);
 
   /// Post request.
   Future<Map<String, dynamic>> post(
