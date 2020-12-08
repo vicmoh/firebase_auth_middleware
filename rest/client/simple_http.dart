@@ -152,7 +152,13 @@ class SimpleHttp {
           res = ServerResponse(await _http.post(apiUrl + urlPath,
               headers: headers, body: Map<String, String>.from(body)));
       } catch (err) {
-        throw Exception(err);
+        String errMess = 'Something went wrong. Try again later.';
+        try {
+          errMess = err?.message;
+        } catch (err) {
+          Log(this, 'Could not get error message.');
+        }
+        throw Exception(errMess);
       }
     }
 
