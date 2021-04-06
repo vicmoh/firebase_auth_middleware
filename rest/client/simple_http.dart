@@ -138,7 +138,7 @@ class SimpleHttp {
             await SimpleHttp.accessToken(TokenStatus(isTokenExpired: true));
         if (debug && token == null)
           Log(this, 'Token has expired. Token must not be null.');
-        headers = {'Authorization': 'Bearer ${token}'};
+        headers = {'Authorization': 'Bearer $token'};
       } catch (err) {
         throw Exception('Could not get new token session.');
       }
