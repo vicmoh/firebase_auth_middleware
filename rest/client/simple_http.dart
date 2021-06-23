@@ -3,7 +3,33 @@ import 'package:dart_util/dart_util.dart';
 import './server_response.dart';
 import 'package:meta/meta.dart';
 
+/// Function for parsing try catch error.
+/// If the error type is not known.
+/// This function will make sure that
+/// it returns the correct message.
+String _parseError(err, {String message}) {
+  try {
+    if (err?.message is String) return err.message;
+    if (err is String) return err;
+  } catch (err) {
+    return message ?? err.toString();
+  }
+  return message ?? err.toString();
+}
+
 enum _HttpType { post, get }
+
+/// A custom HTTP exception.
+class HttpException implements Exception {
+  /// The exception string.
+  final String message;
+
+  /// A custom HTTP exception.
+  HttpException(this.message);
+
+  @override
+  String toString() => message;
+}
 
 /// Token status.
 class TokenStatus {
@@ -140,7 +166,7 @@ class SimpleHttp {
           Log(this, 'Token has expired. Token must not be null.');
         headers = {'Authorization': 'Bearer $token'};
       } catch (err) {
-        throw Exception('Could not get new token session.');
+        throw HttpException('Could not get new token session.');
       }
 
       /// Second try with another new token.
@@ -152,14 +178,15 @@ class SimpleHttp {
           res = ServerResponse(await _http.post(apiUrl + urlPath,
               headers: headers, body: Map<String, String>.from(body)));
       } catch (err) {
-        throw Exception(err);
+        throw HttpException(_parseError(err));
       }
     }
 
     /// Return the response.
     if (debug && res.isError)
       Log(func, 'Server request error -> ${res.message}');
-    if (res.isError) throw Exception(res.message);
+    if (res.isError) throw HttpException(_parseError(res.message));
+
     try {
       if (debug) Log(func, 'res.data: ${res.data}');
       return Map<String, dynamic>.from(res.data);
