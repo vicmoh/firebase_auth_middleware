@@ -2,6 +2,15 @@ import 'package:http/http.dart' as _http;
 import 'package:dart_util/dart_util.dart';
 import './server_response.dart';
 import 'package:meta/meta.dart';
+import 'dart:convert';
+
+extension GetResponseObject on Map {
+  /// Get the HTTP Response object map data
+  /// from the rest. This getter parse
+  /// the response into a map object.
+  Map<String, dynamic> get responseData =>
+      Map<String, dynamic>.from(jsonDecode(this['response'] ?? '{}'));
+}
 
 /// Function for parsing try catch error.
 /// If the error type is not known.
