@@ -119,6 +119,7 @@ export class SimpleResponse {
    */
   setResponseData(data: Object) {
     this._responseData["response"] = JSON.stringify(data ?? {});
+    return this;
   }
 
   /**
