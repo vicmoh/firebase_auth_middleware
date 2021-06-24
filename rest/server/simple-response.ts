@@ -13,7 +13,6 @@ export class SimpleResponse {
   private _devMessage: string;
   private _message: string;
   private _data: KeyValuePair<any>;
-  private _responseData: KeyValuePair<any>;
   private _code: number;
   private _error: boolean;
   private _res: Response;
@@ -26,7 +25,6 @@ export class SimpleResponse {
     const initMess = "Simple response must call success or error method.";
     this._res = res;
     this._data = {};
-    this._responseData = {};
     this._code = 200;
     this._message = initMess;
     this._devMessage = initMess;
@@ -118,7 +116,7 @@ export class SimpleResponse {
    * @param {Object}
    */
   setResponseData(data: Object) {
-    this._responseData["response"] = JSON.stringify(data ?? {});
+    this._data["response"] = JSON.stringify(data ?? {});
     return this;
   }
 
