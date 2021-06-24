@@ -13,6 +13,7 @@ export class SimpleResponse {
   private _devMessage: string;
   private _message: string;
   private _data: KeyValuePair<any>;
+  private _responseData: KeyValuePair<any>;
   private _code: number;
   private _error: boolean;
   private _res: Response;
@@ -22,9 +23,10 @@ export class SimpleResponse {
    * @param {*} res Express result
    */
   constructor(res: Response) {
-    const initMess = "Simple response must call success or error method."; 
+    const initMess = "Simple response must call success or error method.";
     this._res = res;
     this._data = {};
+    this._responseData = {};
     this._code = 200;
     this._message = initMess;
     this._devMessage = initMess;
@@ -97,12 +99,26 @@ export class SimpleResponse {
   }
 
   /**
-   * Include data in result
+   * Include data in result. This function
+   * does not stringify JSON object.
+   *
+   * Recommend to use "responseData()" instead
+   * of this function,
+   *
    * @param {Object} data
    */
   setData(data: Object) {
     this._data = data ?? {};
     return this;
+  }
+
+  /**
+   * Set the response data, this function
+   * will parse to JSON string.
+   * @param {Object}
+   */
+  setResponseData(data: Object) {
+    this._responseData["response"] = JSON.stringify(data ?? {});
   }
 
   /**
