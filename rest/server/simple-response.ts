@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import { KeyValuePair } from "./key-value-pair";
 
 declare global {
@@ -7,6 +7,23 @@ declare global {
       simpleResponse: SimpleResponse;
     }
   }
+}
+
+/// The REST method types.
+export enum FromMethod {
+  GET,
+  POST,
+}
+
+/**
+ * Get the POST request data.
+ * @param req Request node express.
+ * @param method of GET or POST type.
+ */
+export function getRequestData(req: Request, method: FromMethod) {
+  if (method === FromMethod.POST) return JSON.parse(req.body.request);
+  else if (method === FromMethod.GET)
+    return JSON.parse(req.query.request as string);
 }
 
 export class SimpleResponse {
