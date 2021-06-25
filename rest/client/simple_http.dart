@@ -205,12 +205,44 @@ class SimpleHttp {
     }
   }
 
-  /// Get request.
+  /// GET http request. Please note that this
+  /// is dependent on server side using this package.
+  /// This functions parses the request
+  /// data and return a JSON object requested
+  /// from the back end instead if string.
+  Future<Map<String, dynamic>> getRequest(
+    String urlPath,
+    Map body, {
+    bool noCache = false,
+  }) async =>
+      (await this.get(
+        urlPath,
+        {'request': jsonEncode(body)},
+        noCache: noCache,
+      ))
+          .responseData;
+
+  /// POST http request. Please not that this 
+  /// is dependent on server side using this package.
+  /// This functions parses the request data that is received
+  /// from the backend and return the JSON object instead
+  /// of string.
+  Future<Map<String, dynamic>> postRequest(String urlPath, Map body) async =>
+      (await this.post(urlPath, {
+        'request': jsonEncode(body),
+      }))
+          .responseData;
+
+  /// GET request. This does not parse the JSON string.
+  /// Data sent with JSON string must be parsed. Checkout
+  /// getRequest() function instead.
   Future<Map<String, dynamic>> get(String urlPath, Map<String, String> body,
           {bool noCache = false}) async =>
       _request(urlPath, body: body, httpType: _HttpType.get, noCache: noCache);
 
-  /// Post request.
+  /// POST request. This does not parse the JSON string.
+  /// Data sent with JSON string must be parsed. Checkout
+  /// getRequest() function instead.
   Future<Map<String, dynamic>> post(
           String urlPath, Map<String, dynamic> body) async =>
       _request(urlPath, body: body, httpType: _HttpType.post);
