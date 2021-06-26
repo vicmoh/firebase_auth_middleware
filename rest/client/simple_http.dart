@@ -222,7 +222,7 @@ class SimpleHttp {
       ))
           .responseData;
 
-  /// POST http request. Please not that this 
+  /// POST http request. Please not that this
   /// is dependent on server side using this package.
   /// This functions parses the request data that is received
   /// from the backend and return the JSON object instead
