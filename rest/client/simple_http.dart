@@ -222,7 +222,7 @@ class SimpleHttp {
       ))
           .responseData;
 
-  /// POST http request. Please not that this
+  /// POST http request. Please note that this
   /// is dependent on server side using this package.
   /// This functions parses the request data that is received
   /// from the backend and return the JSON object instead
@@ -233,14 +233,14 @@ class SimpleHttp {
       }))
           .responseData;
 
-  /// GET request. This does not parse the JSON string.
+  /// GET request. This does note parse the JSON string.
   /// Data sent with JSON string must be parsed. Checkout
   /// getRequest() function instead.
   Future<Map<String, dynamic>> get(String urlPath, Map<String, String> body,
           {bool noCache = false}) async =>
       _request(urlPath, body: body, httpType: _HttpType.get, noCache: noCache);
 
-  /// POST request. This does not parse the JSON string.
+  /// POST request. This does note parse the JSON string.
   /// Data sent with JSON string must be parsed. Checkout
   /// getRequest() function instead.
   Future<Map<String, dynamic>> post(
