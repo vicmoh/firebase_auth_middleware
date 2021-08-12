@@ -21,7 +21,7 @@ export enum FromMethod {
  * @param method of GET or POST type.
  */
 export function getRequestData(req: Request, method: FromMethod) {
-  if (method === FromMethod.POST) return JSON.parse(req.body.request);
+  if (method === FromMethod.POST) return JSON.parse(req.body.request as string);
   else if (method === FromMethod.GET)
     return JSON.parse(req.query.request as string);
 }
