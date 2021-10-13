@@ -162,8 +162,8 @@ class SimpleHttp {
         res = ServerResponse(await _get(apiUrl, urlPath,
             body: Map<String, String>.from(body), headers: headers));
       else
-        res = ServerResponse(
-            await _http.post(apiUrl + urlPath, headers: headers, body: body));
+        res = ServerResponse(await _http.post(Uri.parse(apiUrl + urlPath),
+            headers: headers, body: body));
     } catch (err) {
       /// Session is probably expired.
       if (debug) Log(this, 'Token may have expired.');
@@ -184,7 +184,7 @@ class SimpleHttp {
           res = ServerResponse(await _get(apiUrl, urlPath,
               body: Map<String, String>.from(body), headers: headers));
         else
-          res = ServerResponse(await _http.post(apiUrl + urlPath,
+          res = ServerResponse(await _http.post(Uri.parse(apiUrl + urlPath),
               headers: headers, body: Map<String, String>.from(body)));
       } catch (err) {
         throw HttpException(_parseError(err));
