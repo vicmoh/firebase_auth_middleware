@@ -11,15 +11,14 @@ class ServerResponse {
   var data;
 
   /// Response message.
-  String message;
+  String? message;
 
   /// Create server response.
   ServerResponse(Response res) {
     try {
       if (!_isValidResponse(res)) throw Exception("Invalid server response!");
       var errMess = 'The URL api request is probably wrong.';
-      assert(res.body != "", errMess);
-      assert(res.body != null, errMess);
+      assert(res.body.trim() != "", errMess);
       var jsonObject = json.decode(res.body);
       //Check for success object
       if (jsonObject["success"] != null) {
@@ -45,13 +44,14 @@ class ServerResponse {
 
   /// Check if the response is valid and ok.
   static bool _isValidResponse(Response res) {
-    if (!_isValidStatusCode(res?.statusCode) || res?.body == null) return false;
+    if (!_isValidStatusCode(res.statusCode) || res.body == '') return false;
     return true;
   }
 
   /// Check if status code is valid
-  static bool _isValidStatusCode(int code) {
-    if (code < 200 || code > 404 || code == null) return false;
+  static bool _isValidStatusCode(int? code) {
+    if (code == null) return false;
+    if (code < 200 || code > 404) return false;
     return true;
   }
 }
