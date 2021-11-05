@@ -3,4 +3,5 @@ rest/client/.dart_tool/package_config.json
 rest/client/.dart_tool/package_config_subset
 rest/client/.dart_tool/version
 rest/client/.packages
+rest/client/pubspec.lock
 
