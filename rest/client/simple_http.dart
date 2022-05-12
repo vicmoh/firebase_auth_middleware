@@ -80,14 +80,15 @@ class SimpleHttp {
     bool showDebug = false,
   }) : _debug = showDebug {
     if (!isInit) {
-      assert(defaultApiUrl != null,
-          'apiUrl must be passed if SimpleHttp.init() is never called.');
       assert(accessToken != null,
           'accessToken must be passed if SimpleHttp.init() is never called.');
       SimpleHttp._accessToken =
           accessToken as Future<String?> Function(TokenStatus)?;
     }
+
     this.apiUrl = apiUrl ?? _defaultApiUrl;
+    assert(this.apiUrl != null,
+        'apiUrl must be passed if SimpleHttp.init() is never called.');
   }
 
   /// Initialize default setup for
@@ -97,11 +98,10 @@ class SimpleHttp {
   /// If this is initialize. Get's and post's
   /// [accessToken] and [apiUrl] can be passed as null,
   /// else they must be passed upon calling post or get request.
-  static void init({
+  static Future<void> init({
     required Future<String?> Function(TokenStatus) accessToken,
     required String defaultApiUrl,
-  }) {
-    assert(!isInit, 'You should only only call SimpleHttp.init() once.');
+  }) async {
     SimpleHttp.isInit = true;
     SimpleHttp._accessToken = accessToken;
     SimpleHttp._defaultApiUrl = defaultApiUrl;
