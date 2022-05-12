@@ -98,10 +98,10 @@ class SimpleHttp {
   /// If this is initialize. Get's and post's
   /// [accessToken] and [apiUrl] can be passed as null,
   /// else they must be passed upon calling post or get request.
-  static Future<void> init({
+  static void init({
     required Future<String?> Function(TokenStatus) accessToken,
     required String defaultApiUrl,
-  }) async {
+  }) {
     SimpleHttp.isInit = true;
     SimpleHttp._accessToken = accessToken;
     SimpleHttp._defaultApiUrl = defaultApiUrl;
