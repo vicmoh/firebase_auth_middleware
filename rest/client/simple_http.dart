@@ -56,13 +56,23 @@ class SimpleHttp {
   static Future<String?> Function(TokenStatus)? get accessToken => _accessToken;
   static Future<String?> Function(TokenStatus)? _accessToken;
 
+  /// Determine if the http request is production
+  /// or local environment.
+  static bool _isProd = false;
+  static String? _apiUrlEnv() => _isProd ? _defaultApiUrl : _defaultLocalApiUrl;
+
   /// The default api url that is initialize.
   /// on [init] initialization.
   static String? get defaultApiUrl => _defaultApiUrl;
   static String? _defaultApiUrl;
 
+  /// The default api url that is initialize.
+  static String? get defaultLocalApiUrl => _defaultLocalApiUrl;
+  static String? _defaultLocalApiUrl;
+
   /// The main domain URL for requesting data
-  String? apiUrl;
+  String? get apiUrl => _apiUrl;
+  late String? _apiUrl;
 
   /// Determine it is using
   /// [init] function.
@@ -86,9 +96,9 @@ class SimpleHttp {
           accessToken as Future<String?> Function(TokenStatus)?;
     }
 
-    this.apiUrl = apiUrl ?? _defaultApiUrl;
-    assert(this.apiUrl != null,
-        'apiUrl must be passed if SimpleHttp.init() is never called.');
+    this._apiUrl = apiUrl ?? _apiUrlEnv();
+    assert(this._apiUrl != null,
+        'SimpleHttp() must be initialized with an api url. You can call SimpleHttp.init() to initialize the api url.');
   }
 
   /// Initialize default setup for
@@ -101,10 +111,14 @@ class SimpleHttp {
   static void init({
     required Future<String?> Function(TokenStatus) accessToken,
     required String defaultApiUrl,
+    String? defaultLocalApiUrl,
+    bool isProd = false,
   }) {
+    SimpleHttp._isProd = isProd;
     SimpleHttp.isInit = true;
     SimpleHttp._accessToken = accessToken;
     SimpleHttp._defaultApiUrl = defaultApiUrl;
+    SimpleHttp._defaultLocalApiUrl = defaultLocalApiUrl;
   }
 
   /// HTTP get. [url] example: 'www.myUrl.com'.
@@ -146,15 +160,15 @@ class SimpleHttp {
     }
 
     /// Try without refreshing token.
-    Log(this, 'Http request: $apiUrl$urlPath');
+    Log(this, 'Http request: $_apiUrl$urlPath');
     ServerResponse res;
     try {
       /// First try if the token is not expired.
       if (_HttpType.get == httpType)
-        res = ServerResponse(await (_get(apiUrl!, urlPath,
+        res = ServerResponse(await (_get(_apiUrl!, urlPath,
             body: Map<String, String>.from(body), headers: headers)));
       else
-        res = ServerResponse(await _http.post(Uri.parse(apiUrl! + urlPath),
+        res = ServerResponse(await _http.post(Uri.parse(_apiUrl! + urlPath),
             headers: headers, body: body));
     } catch (err) {
       /// Session is probably expired.
@@ -173,10 +187,10 @@ class SimpleHttp {
       /// Second try with another new token.
       try {
         if (httpType == _HttpType.get)
-          res = ServerResponse(await (_get(apiUrl!, urlPath,
+          res = ServerResponse(await (_get(_apiUrl!, urlPath,
               body: Map<String, String>.from(body), headers: headers)));
         else
-          res = ServerResponse(await _http.post(Uri.parse(apiUrl! + urlPath),
+          res = ServerResponse(await _http.post(Uri.parse(_apiUrl! + urlPath),
               headers: headers, body: Map<String, String>.from(body)));
       } catch (err) {
         throw HttpException(_parseError(err));
@@ -207,6 +221,7 @@ class SimpleHttp {
     Map body, {
     bool noCache = false,
   }) async =>
+      // ignore: deprecated_member_use_from_same_package
       (await this.get(
         urlPath,
         {'request': jsonEncode(body)},
@@ -220,6 +235,7 @@ class SimpleHttp {
   /// from the backend and return the JSON object instead
   /// of string.
   Future<Map<String, dynamic>> postRequest(String urlPath, Map body) async =>
+      // ignore: deprecated_member_use_from_same_package
       (await this.post(urlPath, {
         'request': jsonEncode(body),
       }))!
@@ -228,6 +244,7 @@ class SimpleHttp {
   /// GET request. This does note parse the JSON string.
   /// Data sent with JSON string must be parsed. Checkout
   /// getRequest() function instead.
+  @Deprecated('Use getRequest() instead.')
   Future<Map<String, dynamic>?> get(String urlPath, Map<String, String?> body,
           {bool noCache = false}) async =>
       _request(urlPath, body: body, httpType: _HttpType.get, noCache: noCache);
@@ -235,6 +252,7 @@ class SimpleHttp {
   /// POST request. This does note parse the JSON string.
   /// Data sent with JSON string must be parsed. Checkout
   /// getRequest() function instead.
+  @Deprecated('Use postRequest() instead.')
   Future<Map<String, dynamic>?> post(
           String urlPath, Map<String, dynamic> body) async =>
       _request(urlPath, body: body, httpType: _HttpType.post);

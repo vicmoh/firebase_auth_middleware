@@ -1,6 +1,6 @@
 name: firebase_auth_middleware
 description: Flutter package containing widgets and components.
-version: 0.0.10
+version: 0.0.11
 homepage: https://github.com/vicmoh/firebase_auth_middleware
 
 environment:

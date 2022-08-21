@@ -5,3 +5,4 @@ rest/client/.dart_tool/version
 rest/client/.packages
 rest/client/pubspec.lock
 
+/rest/server/node_modules/
