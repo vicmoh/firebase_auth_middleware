@@ -1,6 +1,6 @@
 ## [0.0.11] - 8/21/22
 
-- Update to null-safety
+- Added option for local host as default.
 
 ## [0.0.9] - 10/13/21
 
