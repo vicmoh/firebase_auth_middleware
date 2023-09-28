@@ -1,4 +1,5 @@
 import { Response, Request } from "express";
+import { FirebaseAuthMiddleware } from "../../firebase_auth_middleware";
 import { KeyValuePair } from "./key-value-pair";
 
 declare global {
@@ -33,19 +34,29 @@ export class SimpleResponse {
   private _code: number;
   private _error: boolean;
   private _res: Response;
+  private _req: Request;
+  private _isPublic: boolean;
+
+  static _defaultIsPublic = false;
+
+  static initDefault(option: { isPublic: boolean}) {
+    this._defaultIsPublic = option.isPublic
+  }
 
   /**
    * Constructor
    * @param {*} res Express result
    */
-  constructor(res: Response) {
+  constructor(req: Request, res: Response) {
     const initMess = "Simple response must call success or error method.";
+    this._req = req;
     this._res = res;
     this._data = {};
     this._code = 200;
     this._message = initMess;
     this._devMessage = initMess;
     this._error = true;
+    this._isPublic = SimpleResponse._defaultIsPublic;
   }
 
   /**
@@ -138,9 +149,24 @@ export class SimpleResponse {
   }
 
   /**
+   * Determines whether or not to run middleware
+   * related to authorizing an endpoint
+   * @param isPublic
+   */
+  setPublic(isPublic: boolean) {
+    this._isPublic = isPublic;
+    return this;
+  }
+
+  /**
    * Return final status result
    */
-  send() {
+  async send(): Promise<void> {
+
+    if (!this._isPublic) {
+      await FirebaseAuthMiddleware.validateIdToken(this._req,this._res);
+    }
+
     //If code is undefined send an error 500
     if (this._code === undefined || this._code === null) {
       this._code = 500;
