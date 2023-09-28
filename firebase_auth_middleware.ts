@@ -107,7 +107,7 @@ export class FirebaseAuthMiddleware {
    * @param res
    * @param next
    */
-  public async validateIdToken(req: any, res: any, next: any = null) {
+  public static async validateIdToken(req: any, res: any, next: any = null) {
     console.log("Check if request is authorized with Firebase ID token");
 
     if (
