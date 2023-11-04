@@ -74,7 +74,7 @@ class SimpleHttp {
   static String? _acceptLanguage;
   static String? get acceptLanguage => _acceptLanguage;
 
-  void setDefaultAcceptLanguageHeader(String? lang) {
+  static void setDefaultAcceptLanguageHeader(String? lang) {
     _acceptLanguage = lang;
   }
 
