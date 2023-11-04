@@ -70,6 +70,14 @@ class SimpleHttp {
   static String? get defaultLocalApiUrl => _defaultLocalApiUrl;
   static String? _defaultLocalApiUrl;
 
+  /// The accepted language code header.
+  static String? _acceptLanguage;
+  static String? get acceptLanguage => _acceptLanguage;
+
+  void setDefaultAcceptLanguageHeader(String? lang) {
+    _acceptLanguage = lang;
+  }
+
   /// The main domain URL for requesting data
   String? get apiUrl => _apiUrl;
   late String? _apiUrl;
@@ -157,6 +165,10 @@ class SimpleHttp {
           'no-cache, no-store, must-revalidate, max-age=0';
       headers['Pragma'] = 'no-cache';
       headers['Expires'] = '0';
+    }
+
+    if (_acceptLanguage != null) {
+      headers['Accept-Language'] = _acceptLanguage!;
     }
 
     /// Try without refreshing token.
